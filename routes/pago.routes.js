@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 
 const mp = require("../config/mercadoPago");
-const { Preference } = require("mercadopago/resources/preferences");
 
 router.post("/crear-preferencia", async (req, res) => {
   try {
@@ -23,7 +22,8 @@ router.post("/crear-preferencia", async (req, res) => {
       auto_return: "approved",
     };
 
-    const response = await new Preference(mp).create({ body: preference });
+    const response = await mp.preferences.create({ body: preference });
+
     res.json({ id: response.id });
   } catch (error) {
     console.error("❌ Error al crear preferencia:", error);
