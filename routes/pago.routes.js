@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
-
 const mp = require("../config/mercadoPago");
 
 router.post("/crear-preferencia", async (req, res) => {
-  console.log("✅ Recibido payload:", req.body); // NUEVO
+  console.log("✅ Recibido payload:", req.body);
 
   try {
     const preference = {
@@ -34,6 +33,7 @@ router.post("/crear-preferencia", async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 
