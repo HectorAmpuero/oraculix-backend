@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const mp = require("../config/mercadoPago");
+const mercadopago = require("mercadopago");
+
+// Configuración directa aquí:
+mercadopago.configure({
+  access_token: process.env.MERCADOPAGO_ACCESS_TOKEN,
+});
 
 router.post("/crear-preferencia", async (req, res) => {
-  console.log("✅ Recibido payload:", req.body);
+  console.log("📥 Recibido payload:", req.body); // Debug
 
   try {
     const preference = {
@@ -23,7 +28,7 @@ router.post("/crear-preferencia", async (req, res) => {
       auto_return: "approved",
     };
 
-    const response = await mp.preferences.create({ body: preference });
+    const response = await mercadopago.preferences.create({ body: preference });
 
     res.json({ id: response.id });
   } catch (error) {
@@ -33,6 +38,7 @@ router.post("/crear-preferencia", async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 
