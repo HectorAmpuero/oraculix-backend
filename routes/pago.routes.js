@@ -15,9 +15,9 @@ router.post("/crear-preferencia", async (req, res) => {
         },
       ],
       back_urls: {
-        success: "https://oraculix.cl/pago-exitoso",
-        failure: "https://oraculix.cl/pago-error",
-        pending: "https://oraculix.cl/",
+        success: "https://oraculix.vercel.app/pago-exitoso",
+        failure: "https://oraculix.vercel.app/pago-error",
+        pending: "https://oraculix.vercel.app/",
       },
       auto_return: "approved",
     };
