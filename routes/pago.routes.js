@@ -4,6 +4,8 @@ const router = express.Router();
 const mp = require("../config/mercadoPago");
 
 router.post("/crear-preferencia", async (req, res) => {
+  console.log("✅ Recibido payload:", req.body); // NUEVO
+
   try {
     const preference = {
       items: [
