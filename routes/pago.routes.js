@@ -4,10 +4,10 @@ const mercadopago = require("mercadopago");
 
 // Instanciar correctamente el cliente de Mercado Pago
 const mp = new mercadopago.MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
+  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
 });
 
-console.log("🔑 Access Token usado:", process.env.MERCADOPAGO_ACCESS_TOKEN);
+console.log("🔑 Access Token usado:", process.env.MERCADO_PAGO_ACCESS_TOKEN);
 
 const { Preference } = mercadopago;
 
@@ -23,9 +23,9 @@ router.post("/crear-preferencia", async (req, res) => {
         },
       ],
       back_urls: {
-        success: "http://localhost:5173/pago-exitoso",
-        failure: "http://localhost:5173/pago-error",
-        pending: "http://localhost:5173/",
+        success: "https://oraculix-frontend.vercel.app/pago-exitoso",
+        failure: "https://oraculix-frontend.vercel.app/pago-error",
+        pending: "https://oraculix-frontend.vercel.app/",
       },
       auto_return: "approved",
     };
