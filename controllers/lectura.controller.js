@@ -1,5 +1,5 @@
 require("dotenv").config();
-const pool = require("../config/db");
+const db = require("../config/db");
 const { generarInterpretacion } = require("../utils/openai");
 
 const guardarLectura = async (req, res) => {
@@ -40,7 +40,7 @@ const guardarLectura = async (req, res) => {
     });
 
     // Guardar en la base de datos
-    const result = await pool.query(
+    const result = await db.query(
       `INSERT INTO lecturas 
         (nombre, nacimiento, persona_querida, fecha_importante, deseos, numeros_principales, numeros_complementarios)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
