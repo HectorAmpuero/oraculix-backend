@@ -19,8 +19,11 @@ const registrarUsuario = async (req, res) => {
 
     return res.status(201).json({ usuario: resultado.rows[0] });
   } catch (err) {
-    console.error("❌ Error al registrar usuario:", err);
-    return res.status(500).json({ error: "Error del servidor.", detalle: err.message });
+    console.error("🔴 Error al registrar usuario:", err.message, err.stack);
+    return res.status(500).json({
+      error: "Error del servidor.",
+      detalle: err.message, // Mostrar mensaje real en Postman
+    });
   }
 };
 
@@ -41,12 +44,16 @@ const loginUsuario = async (req, res) => {
     const { id, nombre, email: correo } = resultado.rows[0];
     return res.json({ usuario: { id, nombre, email: correo } });
   } catch (err) {
-    console.error("❌ Error al iniciar sesión:", err);
-    return res.status(500).json({ error: "Error del servidor.", detalle: err.message });
+    console.error("🔴 Error al iniciar sesión:", err.message, err.stack);
+    return res.status(500).json({
+      error: "Error del servidor.",
+      detalle: err.message,
+    });
   }
 };
 
 module.exports = { registrarUsuario, loginUsuario };
+
 
 
 
