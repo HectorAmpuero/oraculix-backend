@@ -14,6 +14,9 @@ const pagoRoutes = require("./routes/pago.routes");
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+const usuarioRoutes = require("./routes/usuario.routes");
+app.use("/api/usuarios", usuarioRoutes);
+
 // Middleware
 app.use(cors({
   origin: ['https://oraculix.cl', 'http://localhost:5173'],
@@ -38,3 +41,5 @@ app.use("/api/pago", pagoRoutes);
 app.listen(PORT, () => {
   console.log("🟢 Servidor backend corriendo en http://localhost:" + PORT);
 });
+
+
