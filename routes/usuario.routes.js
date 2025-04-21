@@ -1,3 +1,4 @@
+console.log("✅ usuario.routes.js fue cargado correctamente");
 const express = require("express");
 const router = express.Router();
 const usuarioController = require("../controllers/usuario.controller");
