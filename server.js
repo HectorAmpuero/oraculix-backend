@@ -12,7 +12,7 @@ const interpretacionRoutes = require("./routes/interpretacion.routes");
 const pagoRoutes = require("./routes/pago.routes");
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000; // o cualquier otro, Render lo ignora
 
 // Middleware
 app.use(cors({
