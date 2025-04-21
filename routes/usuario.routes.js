@@ -6,8 +6,10 @@ const usuarioController = require("../controllers/usuario.controller");
 router.post("/registrar", usuarioController.registrarUsuario);
 
 router.get("/test", (req, res) => {
+    console.log("📡 Se recibió una solicitud a /api/usuarios/test");
     res.send("Ruta /api/usuarios/test funcionando");
   });
+  
   
 
 // Ruta para login
