@@ -16,10 +16,12 @@ const PORT = process.env.PORT;
 
 // Middleware
 app.use(cors({
-  origin: ['https://oraculix.cl', 'http://localhost:5173'],
+  origin: ['https://www.oraculix.cl', 'https://oraculix.cl', 'http://localhost:5173'],
   methods: ['GET', 'POST'],
   credentials: true
 }));
+
+
 app.use(express.json());
 
 const usuarioRoutes = require("./routes/usuario.routes");
