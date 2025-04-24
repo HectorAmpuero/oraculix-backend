@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { MercadoPagoConfig, Preference } = require("mercadopago");
 
-// ✅ Crear instancia configurada
+// ✅ Crear instancia configuradaA
 const mp = new MercadoPagoConfig({
   accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
 });
