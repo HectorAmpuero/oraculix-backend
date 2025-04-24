@@ -1,4 +1,3 @@
-// backend/utils/openai.js
 require("dotenv").config();
 const { OpenAI } = require("openai");
 
@@ -6,7 +5,19 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+function obtenerNumerosAleatorios(cantidad, maximo) {
+  const numeros = new Set();
+  while (numeros.size < cantidad) {
+    numeros.add(Math.floor(Math.random() * maximo) + 1);
+  }
+  return Array.from(numeros);
+}
+
 const generarInterpretacion = async (datos) => {
+  // Generar números aleatorios
+  const numerosPrincipales = obtenerNumerosAleatorios(6, 41);
+  const numerosComplementarios = obtenerNumerosAleatorios(14, 25);
+
   const prompt = `
 Eres un guía espiritual experto en numerología. A partir de los siguientes datos del usuario:
 
@@ -15,8 +26,8 @@ Eres un guía espiritual experto en numerología. A partir de los siguientes dat
 - Persona querida: ${datos.personaQuerida}
 - Fecha importante: ${datos.fechaImportante}
 - Deseos: ${datos.deseos}
-- Números principales: ${datos.numerosPrincipales.join(", ")}
-- Números complementarios: ${datos.numerosComplementarios.join(", ")}
+- Números principales: ${numerosPrincipales.join(", ")}
+- Números complementarios: ${numerosComplementarios.join(", ")}
 
 Escribe un mensaje motivacional, espiritual e intuitivo explicando el significado de sus números y cómo puede usarlos en su vida o juegos de azar. Sé cálido y positivo.
 `;
@@ -26,7 +37,12 @@ Escribe un mensaje motivacional, espiritual e intuitivo explicando el significad
     messages: [{ role: "user", content: prompt }],
   });
 
-  return response.choices[0].message.content;
+  return {
+    interpretacion: response.choices[0].message.content,
+    numerosPrincipales,
+    numerosComplementarios,
+  };
 };
 
 module.exports = { generarInterpretacion };
+
