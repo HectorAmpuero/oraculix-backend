@@ -1,5 +1,6 @@
 require("dotenv").config();
 console.log("🔑 OpenAI Key cargada:", process.env.OPENAI_API_KEY);
+console.log(process.env.MERCADOPAGO_ACCESS_TOKEN)
 
 const express = require("express");
 const cors = require("cors");
