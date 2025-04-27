@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const { MercadoPagoConfig, Preference } = require("mercadopago");
+const { guardarLectura } = require("../controllers/lectura.controller"); // 🚀 Agregamos importar el controlador de guardarLectura
 
-// ✅ Crear instancia configurada
 const mp = new MercadoPagoConfig({
     accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
 });
@@ -10,7 +10,14 @@ const mp = new MercadoPagoConfig({
 router.post("/crear-preferencia", async (req, res) => {
     console.log("📦 Recibido payload:", req.body);
 
+    const { nombre, nacimiento, personaQuerida, fechaImportante, deseos } = req.body;
+
+    if (!nombre || !nacimiento || !personaQuerida || !fechaImportante || !deseos) {
+        return res.status(400).json({ error: "Faltan datos del formulario" });
+    }
+
     try {
+        // 1️⃣ Creamos la preferencia primero
         const preference = {
             items: [
                 {
@@ -30,6 +37,11 @@ router.post("/crear-preferencia", async (req, res) => {
 
         const response = await new Preference(mp).create({ body: preference });
 
+        // 2️⃣ Luego guardamos los datos del formulario en la base de datos
+        req.body.preference_id = response.id; // guardamos también el id de preferencia generado
+        await guardarLectura(req, res, true); // le pasamos "true" para que no termine el response
+
+        // 3️⃣ Respondemos solo el id de preferencia
         res.json({ id: response.id });
     } catch (error) {
         console.error("❌ Error al crear preferencia:", error);
@@ -38,6 +50,7 @@ router.post("/crear-preferencia", async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 
