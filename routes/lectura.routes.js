@@ -1,8 +1,7 @@
-// backend/routes/lectura.routes.js
 const express = require("express");
 const router = express.Router();
 const { guardarLectura } = require("../controllers/lectura.controller");
-const db = require("../config/db"); // 👈 Agregamos conexión a la BD para hacer consultas directas
+const db = require("../config/db"); // 👈 Conexión a la base de datos
 
 // Función para generar números únicos aleatorios
 const generarNumerosUnicos = (cantidad, max) => {
@@ -25,7 +24,6 @@ router.post("/", async (req, res) => {
   const numerosPrincipales = generarNumerosUnicos(6, 41);
   const numerosComplementarios = generarNumerosUnicos(14, 25);
 
-  // Guardamos lectura
   req.body.numeros = {
     principales: numerosPrincipales,
     complementarios: numerosComplementarios
@@ -55,4 +53,18 @@ router.get("/preference/:preference_id", async (req, res) => {
   }
 });
 
+// 🚀 GET: Obtener todas las lecturas (para historial general)
+router.get("/", async (req, res) => {
+  try {
+    const resultado = await db.query(
+      "SELECT * FROM lecturas ORDER BY fecha_creacion DESC"
+    );
+    res.json({ lecturas: resultado.rows });
+  } catch (error) {
+    console.error("❌ Error al buscar todas las lecturas:", error);
+    res.status(500).json({ error: "Error al buscar lecturas" });
+  }
+});
+
 module.exports = router;
+
