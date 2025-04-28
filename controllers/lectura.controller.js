@@ -9,7 +9,8 @@ const guardarLectura = async (req, res, desdePago = false) => {
     personaQuerida,
     fechaImportante,
     deseos,
-    preference_id // 🚀 ahora aceptamos también preference_id
+    preference_id,
+    email // 🆕 ahora también aceptamos email
   } = req.body;
 
   if (!nombre || !nacimiento || !personaQuerida || !fechaImportante || !deseos) {
@@ -30,12 +31,12 @@ const guardarLectura = async (req, res, desdePago = false) => {
       deseos
     });
 
-    // ✅ Insertar en la base de datos
+    // ✅ Insertar en la base de datos incluyendo email
     const resultado = await db.query(
       `INSERT INTO lecturas 
       (nombre, nacimiento, persona_querida, fecha_importante, deseos, 
-       numeros_principales, numeros_complementarios, interpretacion, preference_id) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       numeros_principales, numeros_complementarios, interpretacion, preference_id, email) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
       [
         nombre,
@@ -46,7 +47,8 @@ const guardarLectura = async (req, res, desdePago = false) => {
         numerosPrincipales.join(", "),
         numerosComplementarios.join(", "),
         interpretacion,
-        preference_id || null // 🚀 si viene preference_id, lo guardamos, si no, null
+        preference_id || null,
+        email || null // 🆕 si no viene email, guardamos null
       ]
     );
 
@@ -66,4 +68,5 @@ const guardarLectura = async (req, res, desdePago = false) => {
 };
 
 module.exports = { guardarLectura };
+
 
