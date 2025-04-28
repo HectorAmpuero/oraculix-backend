@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { guardarLectura } = require("../controllers/lectura.controller");
-const db = require("../config/db"); // 👈 Conexión a la base de datos
+const db = require("../config/db");
 
 // Función para generar números únicos aleatorios
 const generarNumerosUnicos = (cantidad, max) => {
@@ -53,18 +53,23 @@ router.get("/preference/:preference_id", async (req, res) => {
   }
 });
 
-// 🚀 GET: Obtener todas las lecturas (para historial general)
-router.get("/", async (req, res) => {
+// 🆕 GET: Obtener lecturas filtradas por email para historial privado
+router.get("/:email", async (req, res) => {
+  const { email } = req.params;
+
   try {
     const resultado = await db.query(
-      "SELECT * FROM lecturas ORDER BY fecha_creacion DESC"
+      "SELECT * FROM lecturas WHERE email = $1 ORDER BY fecha_creacion DESC",
+      [email]
     );
-    res.json({ lecturas: resultado.rows });
+
+    res.json(resultado.rows);
   } catch (error) {
-    console.error("❌ Error al buscar todas las lecturas:", error);
+    console.error("❌ Error al buscar lecturas por email:", error);
     res.status(500).json({ error: "Error al buscar lecturas" });
   }
 });
 
 module.exports = router;
+
 
