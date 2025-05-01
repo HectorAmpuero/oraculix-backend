@@ -1,17 +1,27 @@
 const db = require("../config/db");
 
+// Función para validar contraseña segura
+const esPasswordValida = (password) => {
+  const regex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  return regex.test(password);
+};
+
 // Registrar usuario
 const registrarUsuario = async (req, res) => {
   const { nombre, email, password } = req.body;
 
   try {
-    // Verifica si ya existe
+    if (!esPasswordValida(password)) {
+      return res.status(400).json({
+        error: "La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.",
+      });
+    }
+
     const yaExiste = await db.query("SELECT * FROM usuarios WHERE email = $1", [email]);
     if (yaExiste.rows.length > 0) {
       return res.status(400).json({ error: "El correo ya está registrado." });
     }
 
-    // Inserta nuevo usuario
     const resultado = await db.query(
       "INSERT INTO usuarios (nombre, email, password) VALUES ($1, $2, $3) RETURNING id, nombre, email, fecha_creacion",
       [nombre, email, password]
@@ -22,7 +32,7 @@ const registrarUsuario = async (req, res) => {
     console.error("🔴 Error al registrar usuario:", err.message, err.stack);
     return res.status(500).json({
       error: "Error del servidor.",
-      detalle: err.message, // Mostrar mensaje real en Postman
+      detalle: err.message,
     });
   }
 };
@@ -53,6 +63,7 @@ const loginUsuario = async (req, res) => {
 };
 
 module.exports = { registrarUsuario, loginUsuario };
+
 
 
 
