@@ -32,7 +32,7 @@ const guardarLectura = async (req, res, desdePago = false) => {
       const hoy = new Date();
       const diferenciaDias = Math.floor((hoy - ultimaLectura) / (1000 * 60 * 60 * 24));
 
-      if (diferenciaDias < 60) {
+      if (diferenciaDias < 60 && !desdePago) {
         return res.status(403).json({
           error: "Ciclo lunar no completado",
           mensaje: "Tus números ya fueron revelados en una lectura reciente. Para mantener el equilibrio energético, debes esperar **dos ciclos lunares** antes de una nueva lectura. Confía en el tiempo, lo que debe llegar… llegará."
@@ -40,7 +40,7 @@ const guardarLectura = async (req, res, desdePago = false) => {
       }
     }
 
-    // ✅ Generar interpretación
+    // ✅ Generar interpretación y números
     const {
       interpretacion,
       numerosPrincipales,
@@ -89,4 +89,45 @@ const guardarLectura = async (req, res, desdePago = false) => {
   }
 };
 
-module.exports = { guardarLectura };
+// ✅ NUEVA RUTA: verificar bloqueo sin iniciar pago
+const verificarBloqueo = async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: "Falta el email" });
+  }
+
+  try {
+    const { rows } = await db.query(
+      `SELECT created_at FROM lecturas WHERE email = $1 ORDER BY created_at DESC LIMIT 1`,
+      [email]
+    );
+
+    if (rows.length === 0) {
+      return res.json({ bloqueado: false });
+    }
+
+    const ultimaLectura = new Date(rows[0].created_at);
+    const hoy = new Date();
+    const diferenciaDias = Math.floor((hoy - ultimaLectura) / (1000 * 60 * 60 * 24));
+
+    if (diferenciaDias < 60) {
+      return res.json({
+        bloqueado: true,
+        diasRestantes: 60 - diferenciaDias,
+        mensaje: "Tus números ya fueron revelados en una lectura reciente. Para mantener el equilibrio energético, debes esperar **dos ciclos lunares** antes de una nueva lectura. Confía en el tiempo, lo que debe llegar… llegará."
+      });
+    } else {
+      return res.json({ bloqueado: false });
+    }
+
+  } catch (error) {
+    console.error("❌ Error al verificar bloqueo:", error);
+    res.status(500).json({ error: "Error al verificar el estado" });
+  }
+};
+
+module.exports = {
+  guardarLectura,
+  verificarBloqueo
+};

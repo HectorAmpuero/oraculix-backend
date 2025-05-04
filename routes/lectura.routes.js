@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { guardarLectura } = require("../controllers/lectura.controller");
+const { guardarLectura, verificarBloqueo } = require("../controllers/lectura.controller");
 const db = require("../config/db");
 
 // Función para generar números únicos aleatorios
@@ -69,6 +69,40 @@ router.get("/:email", async (req, res) => {
     res.status(500).json({ error: "Error al buscar lecturas" });
   }
 });
+
+// 🆕 Verificar si un usuario tiene bloqueo activo (ciclo lunar no completado)
+router.get("/verificar-bloqueo/:email", async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    const { rows: lecturas } = await db.query(
+      "SELECT * FROM lecturas WHERE email = $1 ORDER BY created_at DESC LIMIT 1",
+      [email]
+    );
+
+    if (lecturas.length === 0) {
+      return res.json({ bloqueado: false });
+    }
+
+    const ultimaLectura = new Date(lecturas[0].created_at);
+    const hoy = new Date();
+    const diferenciaDias = Math.floor((hoy - ultimaLectura) / (1000 * 60 * 60 * 24));
+
+    if (diferenciaDias < 60) {
+      return res.json({ 
+        bloqueado: true,
+        mensaje: "Tus números ya fueron revelados en una lectura reciente. Para mantener el equilibrio energético, debes esperar dos ciclos lunares antes de una nueva lectura. Confía en el tiempo, lo que debe llegar… llegará."
+      });
+    }
+
+    res.json({ bloqueado: false });
+
+  } catch (error) {
+    console.error("❌ Error al verificar bloqueo:", error);
+    res.status(500).json({ error: "Error al verificar bloqueo" });
+  }
+});
+
 
 module.exports = router;
 
