@@ -10,7 +10,7 @@ const guardarLectura = async (req, res, desdePago = false) => {
     fechaImportante,
     deseos,
     preference_id,
-    email
+    email,
   } = req.body;
 
   if (!nombre || !nacimiento || !personaQuerida || !fechaImportante || !deseos || !email) {
@@ -18,7 +18,6 @@ const guardarLectura = async (req, res, desdePago = false) => {
   }
 
   try {
-    // 🛡️ Verificar si ya tiene una lectura reciente (últimos 60 días)
     const { rows: lecturasAnteriores } = await db.query(
       `SELECT * FROM lecturas 
        WHERE email = $1 
@@ -27,20 +26,31 @@ const guardarLectura = async (req, res, desdePago = false) => {
       [email]
     );
 
+    const hoy = new Date();
+
     if (lecturasAnteriores.length > 0) {
       const ultimaLectura = new Date(lecturasAnteriores[0].created_at);
-      const hoy = new Date();
       const diferenciaDias = Math.floor((hoy - ultimaLectura) / (1000 * 60 * 60 * 24));
 
-      if (diferenciaDias < 60 && !desdePago) {
-        return res.status(403).json({
-          error: "Ciclo lunar no completado",
-          mensaje: "Tus números ya fueron revelados en una lectura reciente. Para mantener el equilibrio energético, debes esperar **dos ciclos lunares** antes de una nueva lectura. Confía en el tiempo, lo que debe llegar… llegará."
-        });
+      if (diferenciaDias < 60) {
+        if (desdePago && !lecturasAnteriores[0].preference_id) {
+          // Actualiza la lectura con el preference_id
+          await db.query(
+            `UPDATE lecturas SET preference_id = $1 WHERE id = $2`,
+            [preference_id, lecturasAnteriores[0].id]
+          );
+          return;
+        }
+
+        if (!desdePago) {
+          return res.status(403).json({
+            error: "Tus números ya fueron revelados en una lectura reciente. Para mantener el equilibrio energético, debes esperar **dos ciclos lunares** antes de una nueva lectura. Confía en el tiempo, lo que debe llegar… llegará."
+          });
+        }
       }
     }
 
-    // ✅ Generar interpretación y números
+    // Generar nueva interpretación y números
     const {
       interpretacion,
       numerosPrincipales,
@@ -53,11 +63,10 @@ const guardarLectura = async (req, res, desdePago = false) => {
       deseos
     });
 
-    // ✅ Insertar lectura
     const resultado = await db.query(
       `INSERT INTO lecturas 
-      (nombre, nacimiento, persona_querida, fecha_importante, deseos, 
-       numeros_principales, numeros_complementarios, interpretacion, preference_id, email) 
+        (nombre, nacimiento, persona_querida, fecha_importante, deseos, 
+         numeros_principales, numeros_complementarios, interpretacion, preference_id, email) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
       [
@@ -89,7 +98,6 @@ const guardarLectura = async (req, res, desdePago = false) => {
   }
 };
 
-// ✅ NUEVA RUTA: verificar bloqueo sin iniciar pago
 const verificarBloqueo = async (req, res) => {
   const { email } = req.query;
 
@@ -131,3 +139,4 @@ module.exports = {
   guardarLectura,
   verificarBloqueo
 };
+
