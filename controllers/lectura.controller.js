@@ -123,7 +123,7 @@ const verificarBloqueo = async (req, res) => {
       return res.json({
         bloqueado: true,
         diasRestantes: 60 - diferenciaDias,
-        mensaje: "Tus números ya fueron revelados en una lectura reciente. Para mantener el equilibrio energético, debes esperar **dos ciclos lunares** antes de una nueva lectura. Confía en el tiempo, lo que debe llegar… llegará."
+        mensaje: "Tus números ya fueron revelados en una lectura reciente. Para mantener el equilibrio energético, debes esperar dos ciclos lunares antes de una nueva lectura. Confía en el tiempo, lo que debe llegar… llegará."
       });
     } else {
       return res.json({ bloqueado: false });
