@@ -10,15 +10,37 @@ const guardarLectura = async (req, res, desdePago = false) => {
     fechaImportante,
     deseos,
     preference_id,
-    email // 🆕 ahora también aceptamos email
+    email
   } = req.body;
 
-  if (!nombre || !nacimiento || !personaQuerida || !fechaImportante || !deseos) {
+  if (!nombre || !nacimiento || !personaQuerida || !fechaImportante || !deseos || !email) {
     return res.status(400).json({ error: "Faltan datos para guardar la lectura" });
   }
 
   try {
-    // ✅ Generar interpretación y números
+    // 🛡️ Verificar si ya tiene una lectura reciente (últimos 60 días)
+    const { rows: lecturasAnteriores } = await db.query(
+      `SELECT * FROM lecturas 
+       WHERE email = $1 
+       ORDER BY created_at DESC 
+       LIMIT 1`,
+      [email]
+    );
+
+    if (lecturasAnteriores.length > 0) {
+      const ultimaLectura = new Date(lecturasAnteriores[0].created_at);
+      const hoy = new Date();
+      const diferenciaDias = Math.floor((hoy - ultimaLectura) / (1000 * 60 * 60 * 24));
+
+      if (diferenciaDias < 60) {
+        return res.status(403).json({
+          error: "Ciclo lunar no completado",
+          mensaje: "Tus números ya fueron revelados en una lectura reciente. Para mantener el equilibrio energético, debes esperar **dos ciclos lunares** antes de una nueva lectura. Confía en el tiempo, lo que debe llegar… llegará."
+        });
+      }
+    }
+
+    // ✅ Generar interpretación
     const {
       interpretacion,
       numerosPrincipales,
@@ -31,7 +53,7 @@ const guardarLectura = async (req, res, desdePago = false) => {
       deseos
     });
 
-    // ✅ Insertar en la base de datos incluyendo email
+    // ✅ Insertar lectura
     const resultado = await db.query(
       `INSERT INTO lecturas 
       (nombre, nacimiento, persona_querida, fecha_importante, deseos, 
@@ -48,7 +70,7 @@ const guardarLectura = async (req, res, desdePago = false) => {
         numerosComplementarios.join(", "),
         interpretacion,
         preference_id || null,
-        email || null // 🆕 si no viene email, guardamos null
+        email
       ]
     );
 
@@ -68,5 +90,3 @@ const guardarLectura = async (req, res, desdePago = false) => {
 };
 
 module.exports = { guardarLectura };
-
-
