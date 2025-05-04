@@ -38,7 +38,7 @@ router.post("/crear-preferencia", async (req, res) => {
     };
 
     // Llamamos a guardarLectura simulando res
-    await guardarLectura(req, customRes, true);
+    await guardarLectura(req, customRes, false);
 
     if (lecturaBloqueada) {
       return res.status(403).json({
