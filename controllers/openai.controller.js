@@ -20,7 +20,7 @@ Deseos: ${deseos}
 Números principales: ${numerosPrincipales.join(", ")}
 Números complementarios: ${numerosComplementarios.join(", ")}
 
-Haz la interpretación en un párrafo breve pero significativo. Usa un tono esperanzador y espiritual. No repitas los números, enfócate en el mensaje que transmiten. Además, debes darle al usuario indicaciones de cómo usar sus nímeros`;
+Haz la interpretación en un párrafo breve pero significativo. Usa un tono esperanzador y espiritual. No repitas los números, enfócate en el mensaje que transmiten. Da una orientación sutil de cómo el usuario puede usar esos números en su vida (especialmente en juegos de la suerte, si lo desea). No seas literal con sus deseos; ve más allá, entrega un mensaje con profundidad. Finaliza con una frase de cierre motivadora o de sabiduría suave. `;
 
   try {
     const completion = await openai.chat.completions.create({
